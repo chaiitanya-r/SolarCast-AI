@@ -6,6 +6,9 @@ Architecture: Input(8) → 128 → ReLU → Dropout(0.2) → 64 → ReLU → 1
 
 from __future__ import annotations
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 import torch
 import torch.nn as nn
 from sklearn.model_selection import train_test_split
@@ -15,9 +18,9 @@ from src.deep_learning._training_utils import (
     set_seeds,
     train_regressor,
 )
-from src.preprocessing.scaling import load_split_data
+from src.preprocessing.scaling import inverse_transform_target, load_split_data
 from src.utils.device import require_cuda
-from src.utils.helpers import timer
+from src.utils.helpers import save_plot, timer
 
 set_seeds(42)
 ANN_EPOCHS = 500
@@ -58,11 +61,12 @@ def run_ann() -> dict:
         epochs=ANN_EPOCHS,
         lr=ANN_LR,
         patience=ANN_PATIENCE,
+        model_label="ANN",
         scheduler_factory=lambda optimizer: torch.optim.lr_scheduler.CosineAnnealingLR(
             optimizer, T_max=ANN_EPOCHS, eta_min=1e-6
         ),
     )
-    return evaluate_and_save(
+    metrics = evaluate_and_save(
         model,
         "ANN",
         train_time=elapsed,
@@ -72,6 +76,52 @@ def run_ann() -> dict:
         train_losses=train_losses,
         val_losses=val_losses,
     )
+    try:
+        plt.style.use("seaborn-v0_8")
+        model.eval()
+        X_test = data["X_test"]
+        y_test = data["y_test"]
+        with torch.no_grad():
+            y_pred_scaled = model(torch.tensor(X_test, dtype=torch.float32).cuda()).cpu().numpy().ravel()
+        y_true = inverse_transform_target(y_test)
+        y_pred = inverse_transform_target(y_pred_scaled)
+        residuals = y_true - y_pred
+
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.scatter(y_pred, residuals, alpha=0.5, s=12, color="tab:blue")
+        ax.axhline(0, color="red", linestyle="--", linewidth=1.5)
+        ax.set_title("ANN Residual Plot")
+        ax.set_xlabel("Predicted Irradiance")
+        ax.set_ylabel("Residual (Actual - Predicted)")
+        ax.grid(True, alpha=0.3)
+        plt.tight_layout()
+        save_plot(fig, "ann_residuals.png")
+        plt.close(fig)
+
+        fig, ax = plt.subplots(figsize=(12, 6))
+        sns.histplot(residuals, bins=30, kde=True, ax=ax, color="tab:purple")
+        ax.axvline(0, color="red", linestyle="--", linewidth=1.5)
+        ax.set_title("ANN Residual Error Distribution")
+        ax.set_xlabel("Residual")
+        ax.set_ylabel("Frequency")
+        plt.tight_layout()
+        save_plot(fig, "ann_error_distribution.png")
+        plt.close(fig)
+
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.scatter(y_true, y_pred, alpha=0.5, s=12, color="tab:green")
+        line_min, line_max = min(np.min(y_true), np.min(y_pred)), max(np.max(y_true), np.max(y_pred))
+        ax.plot([line_min, line_max], [line_min, line_max], "r--", linewidth=1.5)
+        ax.set_title("ANN Actual vs Predicted Scatter")
+        ax.set_xlabel("Actual Irradiance")
+        ax.set_ylabel("Predicted Irradiance")
+        ax.grid(True, alpha=0.3)
+        plt.tight_layout()
+        save_plot(fig, "ann_actual_vs_predicted_scatter.png")
+        plt.close(fig)
+    except Exception as exc:
+        print(f"[warn] Could not generate ANN residual diagnostics: {exc}")
+    return metrics
 
 
 def main() -> dict:

@@ -9,8 +9,10 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-from src.utils.helpers import ensure_dirs, get_project_root, timer
+from src.utils.helpers import ensure_dirs, get_project_root, save_plot, timer
 
 np.random.seed(42)
 
@@ -32,9 +34,9 @@ def run_cleaning() -> pd.DataFrame:
     out_path = root / "data" / "processed" / "cleaned_solar_data.csv"
 
     df = pd.read_csv(raw_path)
+    df_before = df.copy()
     n_start = len(df)
-    print(f"Loaded raw data: shape={df.shape}")
-    print(df.head())
+    n_raw = len(df)
 
     df["datetime"] = pd.to_datetime(
         dict(year=df["Year"], month=df["Month"], day=df["Day"], hour=df["Hour"])
@@ -59,20 +61,75 @@ def run_cleaning() -> pd.DataFrame:
     df["Irradiance"] = _clip_iqr(df["Irradiance"])
 
     n_end = len(df)
-    print("\n=== Cleaning Summary ===")
-    print(f"  Starting rows:           {n_start}")
-    print(f"  Duplicates removed:      {n_dup_removed}")
-    print(f"  Invalid/NaN removed:     {n_invalid_removed}")
-    print(f"  Nighttime rows removed:  {n_night_removed}")
-    print(f"  Temperature clipped:     {temp_clipped}")
-    print(f"  Irradiance clipped:      {irrad_clipped}")
-    print(f"  Final rows:              {n_end} (removed {n_start - n_end} total)")
-    print(f"  Nulls remaining:         {df.isnull().sum().sum()}")
+    print(
+        f"  Cleaned: {n_raw:,} → {n_end:,} rows "
+        f"(dup={n_dup_removed}, invalid={n_invalid_removed}, night={n_night_removed})"
+    )
 
     df.to_csv(out_path, index=False)
-    print(f"\nSaved cleaned data to {out_path}")
-    print(df.head())
-    print(f"Shape: {df.shape}")
+    print(f"  Saved: cleaned_solar_data.csv")
+    print(f"  Output: {len(df):,} rows × {df.columns.size} cols")
+
+    try:
+        plt.style.use("seaborn-v0_8")
+        fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+        axes[0, 0].hist(df_before["Irradiance"].dropna(), bins=30, color="tab:blue", alpha=0.8)
+        axes[0, 0].set_title("Irradiance Before Cleaning")
+        axes[0, 0].set_xlabel("Irradiance")
+        axes[0, 0].set_ylabel("Frequency")
+        axes[1, 0].hist(df["Irradiance"].dropna(), bins=30, color="tab:green", alpha=0.8)
+        axes[1, 0].set_title("Irradiance After Cleaning")
+        axes[1, 0].set_xlabel("Irradiance")
+        axes[1, 0].set_ylabel("Frequency")
+        axes[0, 1].hist(df_before["Temperature"].dropna(), bins=30, color="tab:orange", alpha=0.8)
+        axes[0, 1].set_title("Temperature Before Cleaning")
+        axes[0, 1].set_xlabel("Temperature")
+        axes[0, 1].set_ylabel("Frequency")
+        axes[1, 1].hist(df["Temperature"].dropna(), bins=30, color="tab:red", alpha=0.8)
+        axes[1, 1].set_title("Temperature After Cleaning")
+        axes[1, 1].set_xlabel("Temperature")
+        axes[1, 1].set_ylabel("Frequency")
+        fig.suptitle("Data Distribution Before vs After Cleaning")
+        plt.tight_layout()
+        save_plot(fig, "cleaning_distribution.png")
+        plt.close(fig)
+    except Exception as exc:
+        print(f"[warn] Could not generate cleaning distribution plot: {exc}")
+
+    try:
+        plt.style.use("seaborn-v0_8")
+        fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+        sns.boxplot(y=df["Temperature"], ax=axes[0], color="tab:orange")
+        axes[0].set_title("Temperature Outliers After Cleaning")
+        axes[0].set_xlabel("Temperature")
+        axes[0].set_ylabel("Temperature")
+        sns.boxplot(y=df["Irradiance"], ax=axes[1], color="tab:blue")
+        axes[1].set_title("Irradiance Outliers After Cleaning")
+        axes[1].set_xlabel("Irradiance")
+        axes[1].set_ylabel("Irradiance")
+        plt.tight_layout()
+        save_plot(fig, "cleaning_boxplots.png")
+        plt.close(fig)
+    except Exception as exc:
+        print(f"[warn] Could not generate cleaning boxplots: {exc}")
+
+    try:
+        plt.style.use("seaborn-v0_8")
+        heat_df = (
+            df.groupby(["Hour", "Month"], as_index=False)["Irradiance"]
+            .mean()
+            .pivot(index="Hour", columns="Month", values="Irradiance")
+        )
+        fig, ax = plt.subplots(figsize=(12, 7))
+        sns.heatmap(heat_df, annot=False, cmap="YlOrRd", ax=ax)
+        ax.set_title("Hourly Irradiance Heatmap by Month")
+        ax.set_xlabel("Month")
+        ax.set_ylabel("Hour")
+        plt.tight_layout()
+        save_plot(fig, "irradiance_heatmap_hour_month.png")
+        plt.close(fig)
+    except Exception as exc:
+        print(f"[warn] Could not generate irradiance heatmap: {exc}")
     return df
 
 

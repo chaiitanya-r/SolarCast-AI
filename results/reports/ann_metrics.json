@@ -6,6 +6,7 @@
   "nrmse": 0.046440524987231814,
   "mape": 18.12699512942978,
   "model": "ANN",
-  "train_time_s": 40.92298770000025,
+  "train_time_s": 63.3943276,
+  "epochs_run": 41,
   "device": "cuda:0"
 }

@@ -1,0 +1,14 @@
+[
+  {
+    "feature": "hour_sin",
+    "mean_abs_shap": 0.06615695560442919
+  },
+  {
+    "feature": "hour_cos",
+    "mean_abs_shap": 0.059681821721459485
+  },
+  {
+    "feature": "month_sin",
+    "mean_abs_shap": 0.05216163937365349
+  }
+]

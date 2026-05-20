@@ -62,14 +62,7 @@ def run_kmedoids() -> pd.DataFrame:
     kms_labels = kmeans.fit_predict(X)
     kms_centers = kmeans.cluster_centers_
 
-    print("\n=== Cluster Centers Comparison (Temperature, Irradiance) ===")
-    print(f"{'Cluster':<10} {'KMedoids Temp':>15} {'KMedoids Irr':>14} {'KMeans Temp':>13} {'KMeans Irr':>12}")
-    order = np.argsort(medoid_centers[:, 0])
-    kms_order = np.argsort(kms_centers[:, 0])
-    for i in range(3):
-        mc = medoid_centers[order[i]]
-        kc = kms_centers[kms_order[i]]
-        print(f"  {i:<8} {mc[0]:>15.2f} {mc[1]:>14.2f} {kc[0]:>13.2f} {kc[1]:>12.2f}")
+    print("  KMedoids vs KMeans centers compared (k=3)")
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
     plt.style.use("seaborn-v0_8")
@@ -86,8 +79,35 @@ def run_kmedoids() -> pd.DataFrame:
 
     plt.tight_layout()
     save_plot(fig, "kmedoids_comparison.png")
-    plt.close()
-    print("Saved kmedoids comparison plot.")
+    plt.close(fig)
+
+    try:
+        plt.style.use("seaborn-v0_8")
+        order = np.argsort(medoid_centers[:, 0])
+        kms_order = np.argsort(kms_centers[:, 0])
+        med = medoid_centers[order]
+        kmn = kms_centers[kms_order]
+        clusters = np.arange(3)
+        width = 0.2
+        fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+        for ax, idx, feat in [(axes[0], 0, "Temperature"), (axes[1], 1, "Irradiance")]:
+            bars1 = ax.bar(clusters - width / 2, med[:, idx], width=width, color="tab:blue", label="KMedoids")
+            bars2 = ax.bar(clusters + width / 2, kmn[:, idx], width=width, color="tab:orange", label="KMeans")
+            ax.bar_label(bars1, fmt="%.4f", padding=3)
+            ax.bar_label(bars2, fmt="%.4f", padding=3)
+            ax.set_title(f"{feat} Centers by Cluster")
+            ax.set_xlabel("Cluster")
+            ax.set_ylabel(feat)
+            ax.set_xticks(clusters)
+            ax.set_xticklabels([f"C{i}" for i in clusters])
+            ax.legend()
+        fig.suptitle("KMedoids vs KMeans Cluster Center Comparison")
+        plt.tight_layout()
+        save_plot(fig, "kmedoids_center_comparison.png")
+        plt.close(fig)
+    except Exception as exc:
+        print(f"[warn] Could not generate center comparison chart: {exc}")
+    print("  Saved: kmedoids_comparison.png")
     return sample
 
 

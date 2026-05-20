@@ -165,11 +165,7 @@ def run_scaling() -> dict:
         y_class_train, y_class_test = y_class[:split_idx], y_class[split_idx:]
 
         print(
-
-            f"Chronological split: train={len(X_train_raw)} (up to row {split_idx - 1}), "
-
-            f"test={len(X_test_raw)} (most recent {TEST_SIZE:.0%} of time)"
-
+            f"  Split: chronological  train={len(X_train_raw):,}  test={len(X_test_raw):,}"
         )
 
     else:
@@ -194,7 +190,9 @@ def run_scaling() -> dict:
 
         )
 
-        print(f"Random stratified split: train={len(X_train_raw)}, test={len(X_test_raw)}")
+        print(
+            f"  Split: stratified  train={len(X_train_raw):,}  test={len(X_test_raw):,}"
+        )
 
 
 
@@ -254,9 +252,7 @@ def run_scaling() -> dict:
 
 
 
-    print(f"Scaled features (fit on train only): {feature_names}")
-
-    print(f"Train shape: {X_train.shape}, Test shape: {X_test.shape}")
+    print(f"  Scaled {len(feature_names)} features  train={X_train.shape[0]:,}  test={X_test.shape[0]:,}")
 
     return {
 

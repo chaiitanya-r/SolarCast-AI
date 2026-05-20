@@ -6,9 +6,13 @@ Given sensor/prediction values, produces natural-language solar reports.
 
 from __future__ import annotations
 
+from collections import Counter
+
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
-from src.utils.helpers import ensure_dirs, get_project_root, load_processed, timer
+from src.utils.helpers import ensure_dirs, get_project_root, load_processed, save_plot, timer
 
 
 def _ghi_class(ghi: float) -> str:
@@ -134,7 +138,7 @@ def save_sample_reports(df: pd.DataFrame, n: int = 10) -> None:
         lines.append(row.get("nlp_report", generate_solar_report(row.get("Irradiance", 0), row.get("Temperature", 25))))
         lines.append("")
     path.write_text("\n".join(lines), encoding="utf-8")
-    print(f"Saved {n} sample reports to {path}")
+    print(f"  Saved: sample_nlp_reports.txt")
 
 
 @timer
@@ -142,7 +146,63 @@ def run_nlp() -> pd.DataFrame:
     df = load_processed("engineered_solar_data")
     df = batch_generate_report(df)
     save_sample_reports(df, n=10)
-    print(df[["Irradiance", "Temperature", "nlp_report"]].head(3))
+    try:
+        plt.style.use("seaborn-v0_8")
+        sample_size = min(500, len(df))
+        sampled = batch_generate_report(df.sample(n=sample_size, random_state=42))
+        labels = []
+        for text in sampled["nlp_report"]:
+            t = str(text).lower()
+            if "high solar generation" in t:
+                labels.append("High")
+            elif "moderate solar generation" in t:
+                labels.append("Medium")
+            else:
+                labels.append("Low")
+        counts = pd.Series(labels).value_counts().reindex(["Low", "Medium", "High"]).fillna(0)
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.pie(
+            counts.values,
+            labels=counts.index,
+            autopct="%1.1f%%",
+            startangle=90,
+            colors=plt.cm.tab10([0, 1, 2]),
+        )
+        ax.set_title("Generated Report Class Distribution (Sample)")
+        plt.tight_layout()
+        save_plot(fig, "nlp_report_class_distribution.png")
+        plt.close(fig)
+    except Exception as exc:
+        print(f"[warn] Could not generate NLP class distribution plot: {exc}")
+
+    try:
+        plt.style.use("seaborn-v0_8")
+        stopwords = {
+            "the", "a", "is", "are", "and", "of", "for", "in", "to", "under",
+            "with", "this", "be", "may", "will",
+        }
+        words: list[str] = []
+        for text in df["nlp_report"].astype(str):
+            for w in text.lower().replace(".", " ").replace(",", " ").split():
+                if w and w not in stopwords:
+                    words.append(w)
+        freq = Counter(words)
+        top = freq.most_common(20)
+        if top:
+            labels = [w for w, _ in top][::-1]
+            values = [c for _, c in top][::-1]
+            fig, ax = plt.subplots(figsize=(12, 8))
+            bars = ax.barh(labels, values, color=plt.cm.viridis(np.linspace(0.2, 0.9, len(labels))))
+            ax.bar_label(bars, fmt="%.4f", padding=3)
+            ax.set_title("Top 20 Word Frequencies in Generated Reports")
+            ax.set_xlabel("Frequency")
+            ax.set_ylabel("Word")
+            plt.tight_layout()
+            save_plot(fig, "nlp_word_frequency.png")
+            plt.close(fig)
+    except Exception as exc:
+        print(f"[warn] Could not generate NLP word frequency chart: {exc}")
+    print(f"  Output: {len(df):,} rows with nlp_report column")
     return df
 
 

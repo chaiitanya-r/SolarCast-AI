@@ -42,6 +42,7 @@ def train_regressor(
     patience: int = 20,
     batch_size: int = 64,
     scheduler_factory: Callable[[torch.optim.Optimizer], Any] | None = None,
+    model_label: str | None = None,
 ) -> tuple[list[float], list[float], float]:
     """Train a PyTorch regressor with early stopping; return losses and elapsed time."""
     log_device_once()
@@ -101,14 +102,17 @@ def train_regressor(
         else:
             wait += 1
             if wait >= patience:
-                print(f"Early stopping at epoch {epoch + 1}")
                 break
 
     elapsed = time.perf_counter() - t0
+    epochs_run = len(val_losses)
     if best_state is not None:
         model.load_state_dict(best_state)
     if is_cuda():
         torch.cuda.empty_cache()
+    if model_label:
+        status = "early stop" if epochs_run < epochs else "done"
+        print(f"  {model_label}  → epoch {epochs_run}/{epochs}  val_loss={best_val:.5f}  [{status}]")
     return train_losses, val_losses, elapsed
 
 
@@ -150,6 +154,7 @@ def evaluate_and_save(
     metrics = regression_metrics(y_true, y_pred)
     metrics["model"] = model_name
     metrics["train_time_s"] = train_time
+    metrics["epochs_run"] = len(val_losses)
     metrics["device"] = str(device)
 
     plots_dir = root / "results" / "plots"
@@ -167,8 +172,8 @@ def evaluate_and_save(
 
     report_path = reports_dir / f"{model_name.lower().replace(' ', '_')}_metrics.json"
     report_path.write_text(json.dumps(metrics, indent=2))
-    print(f"\n=== {model_name} Test Metrics ({device}) ===")
-    for k, v in metrics.items():
-        if isinstance(v, float):
-            print(f"  {k}: {v:.4f}")
+    print(
+        f"  {model_name}  rmse={metrics.get('rmse', 0):.4f}  "
+        f"r2={metrics.get('r2', 0):.4f}  ({train_time:.1f}s)"
+    )
     return metrics

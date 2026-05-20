@@ -14,8 +14,10 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-from src.utils.helpers import ensure_dirs, get_project_root, load_processed, timer
+from src.utils.helpers import ensure_dirs, get_project_root, load_processed, save_plot, timer
 
 np.random.seed(42)
 
@@ -48,8 +50,6 @@ def run_feature_engineering() -> pd.DataFrame:
     df = load_processed("cleaned_solar_data")
     df["datetime"] = pd.to_datetime(df["datetime"])
     df = df.sort_values("datetime").reset_index(drop=True)
-    print(f"Input shape: {df.shape}")
-    print(df.head())
 
     df["hour_sin"] = np.sin(2 * np.pi * df["Hour"] / 24)
     df["hour_cos"] = np.cos(2 * np.pi * df["Hour"] / 24)
@@ -85,9 +85,83 @@ def run_feature_engineering() -> pd.DataFrame:
     df = df.dropna(subset=["lag_2h_irradiance"]).reset_index(drop=True)
 
     df.to_csv(out_path, index=False)
-    print(f"\nSaved engineered data to {out_path}")
-    print(df.head())
-    print(f"Shape: {df.shape}")
+    print(f"  Saved: engineered_solar_data.csv")
+    print(f"  Output: {len(df):,} rows × {df.columns.size} cols")
+
+    try:
+        plt.style.use("seaborn-v0_8")
+        class_counts = (
+            df["irradiance_class_label"]
+            .value_counts()
+            .reindex(["Low", "Medium", "High"])
+            .fillna(0)
+        )
+        fig, ax = plt.subplots(figsize=(12, 6))
+        bars = ax.bar(class_counts.index, class_counts.values, color=["tab:blue", "tab:orange", "tab:green"])
+        for container in [bars]:
+            ax.bar_label(container, fmt="%.4f", padding=3)
+        ax.set_title("Irradiance Class Distribution")
+        ax.set_xlabel("Irradiance Class")
+        ax.set_ylabel("Count")
+        plt.tight_layout()
+        save_plot(fig, "class_distribution.png")
+        plt.close(fig)
+    except Exception as exc:
+        print(f"[warn] Could not generate class distribution plot: {exc}")
+
+    try:
+        plt.style.use("seaborn-v0_8")
+        fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+        sc1 = axes[0].scatter(df["hour_sin"], df["hour_cos"], c=df["Hour"], cmap="viridis", alpha=0.6, s=12)
+        axes[0].set_title("Hour Cyclical Encoding")
+        axes[0].set_xlabel("hour_sin")
+        axes[0].set_ylabel("hour_cos")
+        axes[0].grid(True, alpha=0.3)
+        fig.colorbar(sc1, ax=axes[0], label="Hour")
+        sc2 = axes[1].scatter(df["month_sin"], df["month_cos"], c=df["Month"], cmap="viridis", alpha=0.6, s=12)
+        axes[1].set_title("Month Cyclical Encoding")
+        axes[1].set_xlabel("month_sin")
+        axes[1].set_ylabel("month_cos")
+        axes[1].grid(True, alpha=0.3)
+        fig.colorbar(sc2, ax=axes[1], label="Month")
+        plt.tight_layout()
+        save_plot(fig, "cyclical_features.png")
+        plt.close(fig)
+    except Exception as exc:
+        print(f"[warn] Could not generate cyclical feature plot: {exc}")
+
+    try:
+        plt.style.use("seaborn-v0_8")
+        numeric_df = df.select_dtypes(include=["number"])
+        fig, ax = plt.subplots(figsize=(14, 10))
+        sns.heatmap(numeric_df.corr(), annot=True, fmt=".2f", cmap="coolwarm", ax=ax)
+        ax.set_title("Engineered Feature Correlation Heatmap")
+        ax.set_xlabel("Features")
+        ax.set_ylabel("Features")
+        plt.tight_layout()
+        save_plot(fig, "feature_correlation_heatmap.png")
+        plt.close(fig)
+    except Exception as exc:
+        print(f"[warn] Could not generate feature correlation heatmap: {exc}")
+
+    try:
+        plt.style.use("seaborn-v0_8")
+        preview = df.head(min(200, len(df)))
+        fig, ax = plt.subplots(figsize=(14, 6))
+        ax.plot(preview.index, preview["Irradiance"], label="Irradiance")
+        ax.plot(preview.index, preview["lag_1h_irradiance"], label="lag_1h_irradiance")
+        ax.plot(preview.index, preview["lag_2h_irradiance"], label="lag_2h_irradiance")
+        ax.plot(preview.index, preview["rolling_mean_3h"], label="rolling_mean_3h")
+        ax.set_title("Lag Features Preview (First 200 Rows)")
+        ax.set_xlabel("Row Index")
+        ax.set_ylabel("Irradiance")
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+        plt.tight_layout()
+        save_plot(fig, "lag_features_preview.png")
+        plt.close(fig)
+    except Exception as exc:
+        print(f"[warn] Could not generate lag features preview: {exc}")
     return df
 
 

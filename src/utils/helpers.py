@@ -8,7 +8,6 @@ processed-data loading, and a timing decorator.
 from __future__ import annotations
 
 import functools
-import time
 from pathlib import Path
 from typing import Any, Callable, TypeVar
 
@@ -79,10 +78,6 @@ def timer(func: F) -> F:
 
     @functools.wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
-        start = time.perf_counter()
-        result = func(*args, **kwargs)
-        elapsed = time.perf_counter() - start
-        print(f"[timer] {func.__name__} completed in {elapsed:.2f}s")
-        return result
+        return func(*args, **kwargs)
 
     return wrapper  # type: ignore[return-value]
