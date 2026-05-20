@@ -1,0 +1,15 @@
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+torch
+xgboost
+lightgbm
+shap
+scipy
+# scikit-learn-extra removed (numpy ABI incompatibility) — KMedoids reimplemented natively
+imbalanced-learn
+tqdm
+streamlit
+joblib

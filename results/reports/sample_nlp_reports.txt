@@ -1,0 +1,29 @@
+--- Sample 0 ---
+Moderate solar generation is forecast for early morning hours during winter with partially favorable irradiance. A temperature of 17°C (Cool) supports the irradiance outlook. Conditions are suitable for steady photovoltaic production.
+
+--- Sample 1 ---
+Moderate solar generation is forecast for early morning hours during winter with partially favorable irradiance. A temperature of 18°C (Cool) supports the irradiance outlook. Conditions are suitable for steady photovoltaic production.
+
+--- Sample 2 ---
+High solar generation conditions are expected during midday hours under clear atmospheric conditions in winter. A temperature of 22°C (Warm) supports the irradiance outlook. This is optimal for peak photovoltaic output.
+
+--- Sample 3 ---
+High solar generation conditions are expected during midday hours under clear atmospheric conditions in winter. A temperature of 24°C (Warm) supports the irradiance outlook. This is optimal for peak photovoltaic output.
+
+--- Sample 4 ---
+High solar generation conditions are expected during midday hours under clear atmospheric conditions in winter. A temperature of 25°C (Warm) supports the irradiance outlook. This is optimal for peak photovoltaic output.
+
+--- Sample 5 ---
+High solar generation conditions are expected during afternoon hours under clear atmospheric conditions in winter. A temperature of 25°C (Warm) supports the irradiance outlook. This is optimal for peak photovoltaic output.
+
+--- Sample 6 ---
+Moderate solar generation is forecast for afternoon hours during winter with partially favorable irradiance. A temperature of 25°C (Warm) supports the irradiance outlook. Conditions are suitable for steady photovoltaic production.
+
+--- Sample 7 ---
+Moderate solar generation is forecast for afternoon hours during winter with partially favorable irradiance. A temperature of 24°C (Warm) supports the irradiance outlook. Conditions are suitable for steady photovoltaic production.
+
+--- Sample 8 ---
+Low solar generation is forecast for afternoon hours. Overcast winter conditions suggest minimal energy yield. A temperature of 22°C (Warm) supports the irradiance outlook. Cloud diffusion may reduce direct normal irradiance significantly.
+
+--- Sample 9 ---
+Low solar generation is forecast for evening hours. Overcast winter conditions suggest minimal energy yield. A temperature of 18°C (Cool) supports the irradiance outlook. Cloud diffusion may reduce direct normal irradiance significantly.

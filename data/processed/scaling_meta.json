@@ -1,0 +1,16 @@
+{
+  "feature_names": [
+    "hour_sin",
+    "hour_cos",
+    "month_sin",
+    "month_cos",
+    "Temperature",
+    "lag_1h_irradiance",
+    "rolling_mean_3h",
+    "clearness_index"
+  ],
+  "n_train": 36465,
+  "n_test": 9117,
+  "chronological_split": true,
+  "test_size": 0.2
+}
