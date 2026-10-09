@@ -16,14 +16,12 @@ from src.utils.helpers import ensure_dirs, get_project_root, save_plot, timer
 
 np.random.seed(42)
 
-
 def _clip_iqr(series: pd.Series, factor: float = 1.5) -> pd.Series:
     """Clip values to [Q1 - factor*IQR, Q3 + factor*IQR] without dropping rows."""
     q1, q3 = series.quantile(0.25), series.quantile(0.75)
     iqr = q3 - q1
     lower, upper = q1 - factor * iqr, q3 + factor * iqr
     return series.clip(lower=lower, upper=upper)
-
 
 @timer
 def run_cleaning() -> pd.DataFrame:
@@ -132,10 +130,8 @@ def run_cleaning() -> pd.DataFrame:
         print(f"[warn] Could not generate irradiance heatmap: {exc}")
     return df
 
-
 def main() -> pd.DataFrame:
     return run_cleaning()
-
 
 if __name__ == "__main__":
     main()

@@ -19,7 +19,6 @@ from src.utils.helpers import ensure_dirs, get_project_root, load_model, save_pl
 np.random.seed(42)
 plt.style.use("seaborn-v0_8")
 
-
 @timer
 def run_shap() -> None:
     ensure_dirs()
@@ -66,9 +65,6 @@ def run_shap() -> None:
     plt.savefig(plots_dir / "shap_importance.png", dpi=150, bbox_inches="tight")
     plt.close()
 
-    # --- Waterfall plots: one per sample, for the predicted class ---
-    # shap_values from TreeExplainer for multiclass is list of arrays [class0_array, class1_array, class2_array]
-    # each array is shape (n_test_samples, n_features)
     n_classes = len(shap_values) if isinstance(shap_values, list) else shap_values.shape[-1]
     feature_names = list(X_test.columns) if hasattr(X_test, "columns") else [f"f{i}" for i in range(X_test.shape[1])]
 
@@ -173,10 +169,8 @@ def run_shap() -> None:
     except Exception as e:
         print(f"  [warn] Force plot failed: {e}")
 
-
 def main() -> None:
     run_shap()
-
 
 if __name__ == "__main__":
     main()

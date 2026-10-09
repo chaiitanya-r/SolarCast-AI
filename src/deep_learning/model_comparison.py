@@ -20,7 +20,6 @@ METRIC_FILES = [
     ("LSTM", "lstm_metrics.json"),
 ]
 
-
 @timer
 def run_model_comparison() -> pd.DataFrame:
     ensure_dirs()
@@ -153,10 +152,8 @@ def run_model_comparison() -> pd.DataFrame:
     print("  Saved: deep_learning_comparison.csv")
     return df
 
-
 def main() -> pd.DataFrame:
     return run_model_comparison()
-
 
 if __name__ == "__main__":
     main()

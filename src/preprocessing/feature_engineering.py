@@ -31,14 +31,10 @@ FEATURE_COLS = [
     "rolling_mean_3h",
     "clearness_index",
 ]
-# Leakage note: rolling_mean_3h and clearness_index MUST use only past irradiance
-# relative to the row timestamp. The label irradiance_class uses *current* Irradiance.
-
 
 def _solar_elevation_approx(hour: pd.Series) -> pd.Series:
     """Approximate solar elevation factor from hour (0 at night edges, 1 at noon)."""
     return np.sin(np.pi * (hour - 6) / 13).clip(lower=0.05)
-
 
 @timer
 def run_feature_engineering() -> pd.DataFrame:
@@ -58,18 +54,15 @@ def run_feature_engineering() -> pd.DataFrame:
 
     df["lag_1h_irradiance"] = df["Irradiance"].shift(1)
     df["lag_2h_irradiance"] = df["Irradiance"].shift(2)
-    # Past-only: mean of hours t-1, t-2, t-3 (no current-hour irradiance)
     df["rolling_mean_3h"] = (
         df["Irradiance"].shift(1).rolling(window=3, min_periods=1).mean()
     )
 
     elevation = _solar_elevation_approx(df["Hour"])
-    # Past-only clearness: use lagged irradiance and max irradiance seen *before* this row
     max_irr_past = df["Irradiance"].expanding().max().shift(1).clip(lower=1.0)
     df["clearness_index"] = df["lag_1h_irradiance"] / (max_irr_past * elevation + 1e-6)
 
     df["date"] = df["datetime"].dt.date
-    # Past-only within-day cumulative mean (excludes current hour; avoids future-day leak)
     df["DGR"] = df.groupby("date", group_keys=False)["Irradiance"].transform(
         lambda s: s.shift(1).expanding(min_periods=1).mean()
     )
@@ -164,10 +157,8 @@ def run_feature_engineering() -> pd.DataFrame:
         print(f"[warn] Could not generate lag features preview: {exc}")
     return df
 
-
 def main() -> pd.DataFrame:
     return run_feature_engineering()
-
 
 if __name__ == "__main__":
     main()

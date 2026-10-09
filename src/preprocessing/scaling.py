@@ -2,27 +2,17 @@
 
 Feature scaling and train/test splitting.
 
-
-
 Fits StandardScaler on features and MinMaxScaler on Irradiance target **on the
 
 training split only** (no test-set leakage into scaler statistics).
-
-
 
 Supports chronological hold-out for time-series honesty (recommended for solar).
 
 """
 
-
-
 from __future__ import annotations
 
-
-
 import json
-
-
 
 import joblib
 
@@ -34,17 +24,11 @@ from sklearn.model_selection import train_test_split
 
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
-
-
 from src.preprocessing.feature_engineering import FEATURE_COLS
 
 from src.utils.helpers import ensure_dirs, get_project_root, load_processed, timer
 
-
-
 np.random.seed(42)
-
-
 
 FEATURE_COLUMNS = FEATURE_COLS
 
@@ -52,17 +36,9 @@ TARGET_COL = "Irradiance"
 
 CLASS_COL = "irradiance_class"
 
-
-
-# Chronological split: last fraction is test (no random mixing of adjacent hours).
-
 USE_CHRONOLOGICAL_SPLIT = True
 
 TEST_SIZE = 0.2
-
-
-
-
 
 def fit_scalers(
 
@@ -82,10 +58,6 @@ def fit_scalers(
 
     return feature_scaler, target_scaler, X_train_scaled, y_train_scaled, FEATURE_COLUMNS
 
-
-
-
-
 def load_scalers() -> tuple[StandardScaler, MinMaxScaler]:
 
     """Load previously saved feature and target scalers."""
@@ -99,10 +71,6 @@ def load_scalers() -> tuple[StandardScaler, MinMaxScaler]:
     target_scaler = joblib.load(models_dir / "target_scaler.joblib")
 
     return feature_scaler, target_scaler
-
-
-
-
 
 def get_train_test_split(
 
@@ -124,10 +92,6 @@ def get_train_test_split(
 
     return train_test_split(X, y, test_size=test_size, random_state=42, stratify=strat)
 
-
-
-
-
 @timer
 
 def run_scaling() -> dict:
@@ -142,15 +106,11 @@ def run_scaling() -> dict:
 
     df = df.sort_values("datetime").reset_index(drop=True)
 
-
-
     X_raw = df[FEATURE_COLUMNS].values.astype(float)
 
     y_raw = df[TARGET_COL].values.astype(float).reshape(-1, 1)
 
     y_class = df[CLASS_COL].values
-
-
 
     if USE_CHRONOLOGICAL_SPLIT:
 
@@ -194,8 +154,6 @@ def run_scaling() -> dict:
             f"  Split: stratified  train={len(X_train_raw):,}  test={len(X_test_raw):,}"
         )
 
-
-
     models_dir = root / "results" / "models"
 
     feature_scaler, target_scaler, X_train, y_train, feature_names = fit_scalers(
@@ -208,13 +166,9 @@ def run_scaling() -> dict:
 
     y_test = target_scaler.transform(y_test_raw).ravel()
 
-
-
     joblib.dump(feature_scaler, models_dir / "feature_scaler.joblib")
 
     joblib.dump(target_scaler, models_dir / "target_scaler.joblib")
-
-
 
     processed_dir = root / "data" / "processed"
 
@@ -229,8 +183,6 @@ def run_scaling() -> dict:
     np.save(processed_dir / "y_class_train.npy", y_class_train)
 
     np.save(processed_dir / "y_class_test.npy", y_class_test)
-
-
 
     meta = {
 
@@ -249,8 +201,6 @@ def run_scaling() -> dict:
     meta_path = root / "data" / "processed" / "scaling_meta.json"
 
     meta_path.write_text(json.dumps(meta, indent=2))
-
-
 
     print(f"  Scaled {len(feature_names)} features  train={X_train.shape[0]:,}  test={X_test.shape[0]:,}")
 
@@ -273,10 +223,6 @@ def run_scaling() -> dict:
         "df": df,
 
     }
-
-
-
-
 
 def load_split_data() -> dict:
 
@@ -306,10 +252,6 @@ def load_split_data() -> dict:
 
     }
 
-
-
-
-
 def inverse_transform_target(y_scaled: np.ndarray) -> np.ndarray:
 
     """Convert scaled target back to original irradiance units."""
@@ -318,20 +260,10 @@ def inverse_transform_target(y_scaled: np.ndarray) -> np.ndarray:
 
     return target_scaler.inverse_transform(y_scaled.reshape(-1, 1)).ravel()
 
-
-
-
-
 def main() -> dict:
 
     return run_scaling()
 
-
-
-
-
 if __name__ == "__main__":
 
     main()
-
-

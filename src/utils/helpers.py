@@ -17,7 +17,6 @@ import pandas as pd
 
 F = TypeVar("F", bound=Callable[..., Any])
 
-
 def get_project_root() -> Path:
     """Return the project root directory (contains main.py and data/)."""
     current = Path(__file__).resolve()
@@ -25,7 +24,6 @@ def get_project_root() -> Path:
         if (parent / "main.py").exists() and (parent / "data").exists():
             return parent
     return current.parents[2]
-
 
 def ensure_dirs() -> None:
     """Create data and results subdirectories if they do not exist."""
@@ -41,7 +39,6 @@ def ensure_dirs() -> None:
     for d in dirs:
         d.mkdir(parents=True, exist_ok=True)
 
-
 def save_plot(fig: plt.Figure, filename: str) -> Path:
     """Save a matplotlib figure to results/plots/ and close it."""
     ensure_dirs()
@@ -50,7 +47,6 @@ def save_plot(fig: plt.Figure, filename: str) -> Path:
     plt.close(fig)
     return path
 
-
 def save_model(model: Any, filename: str) -> Path:
     """Persist a sklearn-compatible model with joblib to results/models/."""
     ensure_dirs()
@@ -58,12 +54,10 @@ def save_model(model: Any, filename: str) -> Path:
     joblib.dump(model, path)
     return path
 
-
 def load_model(filename: str) -> Any:
     """Load a joblib model from results/models/."""
     path = get_project_root() / "results" / "models" / filename
     return joblib.load(path)
-
 
 def load_processed(name: str) -> pd.DataFrame:
     """Load a CSV from data/processed/ (name with or without .csv)."""
@@ -72,7 +66,6 @@ def load_processed(name: str) -> pd.DataFrame:
     path = get_project_root() / "data" / "processed" / name
     return pd.read_csv(path)
 
-
 def timer(func: F) -> F:
     """Decorator that prints elapsed wall-clock time for a function call."""
 
@@ -80,4 +73,4 @@ def timer(func: F) -> F:
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         return func(*args, **kwargs)
 
-    return wrapper  # type: ignore[return-value]
+    return wrapper

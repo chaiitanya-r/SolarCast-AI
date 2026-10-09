@@ -19,7 +19,6 @@ from src.utils.helpers import get_project_root, load_processed, save_plot, timer
 
 np.random.seed(42)
 
-
 def kmedoids_fit(X: np.ndarray, k: int = 3, max_iter: int = 300) -> tuple[np.ndarray, np.ndarray]:
     """
     PAM-style KMedoids using scipy cdist for distance matrix.
@@ -45,7 +44,6 @@ def kmedoids_fit(X: np.ndarray, k: int = 3, max_iter: int = 300) -> tuple[np.nda
 
     labels = np.argmin(dist_matrix[:, medoid_idx], axis=1)
     return labels, medoid_idx
-
 
 @timer
 def run_kmedoids() -> pd.DataFrame:
@@ -109,7 +107,6 @@ def run_kmedoids() -> pd.DataFrame:
         print(f"[warn] Could not generate center comparison chart: {exc}")
     print("  Saved: kmedoids_comparison.png")
     return sample
-
 
 if __name__ == "__main__":
     run_kmedoids()

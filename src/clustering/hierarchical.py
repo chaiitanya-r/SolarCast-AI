@@ -22,7 +22,6 @@ FEATURES = ["Temperature", "Irradiance"]
 K = 3
 SUBSAMPLE = 5000
 
-
 @timer
 def run_hierarchical() -> pd.DataFrame:
     """Build dendrogram on subsample, cut at k=3, compare with KMeans."""
@@ -116,10 +115,8 @@ def run_hierarchical() -> pd.DataFrame:
     print("  Saved: dendrogram.png")
     return df
 
-
 def main() -> pd.DataFrame:
     return run_hierarchical()
-
 
 if __name__ == "__main__":
     main()

@@ -16,7 +16,6 @@ from typing import Callable
 
 from src.utils.helpers import get_project_root
 
-
 def run_stage(index: int, total: int, name: str, func: Callable) -> bool:
     print("──────────────────────────────────────")
     print(f" [{index}/{total}] {name}")
@@ -34,84 +33,70 @@ def run_stage(index: int, total: int, name: str, func: Callable) -> bool:
         print()
         return False
 
-
 def run_cleaning() -> None:
     from src.preprocessing.data_cleaning import run_cleaning as fn
 
     fn()
-
 
 def run_feature_engineering() -> None:
     from src.preprocessing.feature_engineering import run_feature_engineering as fn
 
     fn()
 
-
 def run_scaling() -> None:
     from src.preprocessing.scaling import run_scaling as fn
 
     fn()
-
 
 def run_classification() -> None:
     from src.classification.classification_models import run_classification as fn
 
     fn()
 
-
 def run_kmeans() -> None:
     from src.clustering.kmeans import run_kmeans as fn
 
     fn()
-
 
 def run_kmedoids() -> None:
     from src.clustering.kmedoids import run_kmedoids as fn
 
     fn()
 
-
 def run_hierarchical() -> None:
     from src.clustering.hierarchical import run_hierarchical as fn
 
     fn()
-
 
 def run_gmm() -> None:
     from src.clustering.gaussian_mixture import run_gmm as fn
 
     fn()
 
-
 def run_ann() -> None:
     from src.deep_learning.ann_model import run_ann as fn
 
     fn()
-
 
 def run_dnn() -> None:
     from src.deep_learning.dnn_model import run_dnn as fn
 
     fn()
 
-
 def run_lstm() -> None:
     from src.deep_learning.lstm_model import run_lstm as fn
 
     fn()
-
 
 def run_shap() -> None:
     from src.explainability.shap_analysis import run_shap as fn
 
     fn()
 
-
 def run_model_comparison() -> None:
     from src.deep_learning.model_comparison import run_model_comparison as fn
 
     fn()
-
 
 def _fmt(val: float | int | None, digits: int = 4) -> str:
     if val is None:
@@ -120,12 +105,10 @@ def _fmt(val: float | int | None, digits: int = 4) -> str:
         return f"{val:.{digits}f}"
     return str(val)
 
-
 def _load_json(path: Path) -> dict:
     if path.exists():
         return json.loads(path.read_text(encoding="utf-8"))
     return {}
-
 
 def generate_summary() -> None:
     """Build project_summary.md from saved metrics and report files."""
@@ -330,7 +313,6 @@ Top features by mean |SHAP|:
     out_path.write_text(md, encoding="utf-8")
     print("  Saved: project_summary.md")
 
-
 def main() -> None:
     from src.utils.device import log_device_once, require_cuda
     from src.utils.helpers import ensure_dirs
@@ -371,7 +353,6 @@ def main() -> None:
     print(f"  {ok}/{total} stages completed successfully")
     print("  Results → results/")
     print("══════════════════════════════════════")
-
 
 if __name__ == "__main__":
     main()

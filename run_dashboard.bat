@@ -1,0 +1,3 @@
+@echo off
+echo Starting SolarCast AI Web Dashboard...
+.\.venv\Scripts\python.exe -m streamlit run app.py

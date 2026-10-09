@@ -23,7 +23,7 @@ from sklearn.tree import DecisionTreeClassifier
 try:
     from xgboost import XGBClassifier
 except ImportError:
-    XGBClassifier = None  # type: ignore[misc, assignment]
+    XGBClassifier = None
 
 from src.evaluation.metrics import classification_report_dict
 from src.evaluation.plots import plot_confusion_matrix, plot_roc_curves
@@ -34,7 +34,6 @@ np.random.seed(42)
 
 RUN_HYPERPARAMETER_TUNING = False
 CLASS_LABELS = ["Low", "Medium", "High"]
-
 
 def _get_models() -> dict:
     xgb_model = {}
@@ -58,7 +57,6 @@ def _get_models() -> dict:
         "GradientBoosting": GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=42),
         **xgb_model,
     }
-
 
 @timer
 def run_classification() -> pd.DataFrame:
@@ -228,10 +226,8 @@ def run_classification() -> pd.DataFrame:
     print("  Saved: classification_results.csv")
     return results_df
 
-
 def main() -> pd.DataFrame:
     return run_classification()
-
 
 if __name__ == "__main__":
     main()

@@ -14,14 +14,11 @@ from typing import Any
 import numpy as np
 import torch
 
-# Prefer GPU when available; override with env SOLAR_USE_GPU=0
 USE_GPU = os.environ.get("SOLAR_USE_GPU", "1").strip().lower() not in ("0", "false", "no")
-# Index into visible GPUs (after CUDA_VISIBLE_DEVICES is applied)
 GPU_INDEX = int(os.environ.get("SOLAR_GPU_INDEX", "0"))
 
 _torch_device: torch.device | None = None
 _device_logged = False
-
 
 def get_torch_device() -> torch.device:
     """Return the best available torch device (CUDA > MPS > CPU)."""
@@ -41,22 +38,19 @@ def get_torch_device() -> torch.device:
 
     return _torch_device
 
-
 def is_cuda() -> bool:
     return get_torch_device().type == "cuda"
-
 
 def dataloader_kwargs(batch_size: int = 64, shuffle: bool = True) -> dict[str, Any]:
     """DataLoader settings tuned for GPU transfer."""
     kwargs: dict[str, Any] = {
         "batch_size": batch_size,
         "shuffle": shuffle,
-        "num_workers": 0,  # safe on Windows; increase on Linux if needed
+        "num_workers": 0,
     }
     if is_cuda():
         kwargs["pin_memory"] = True
     return kwargs
-
 
 def set_training_seeds(seed: int = 42) -> None:
     """Set random seeds for numpy and torch (including CUDA)."""
@@ -66,7 +60,6 @@ def set_training_seeds(seed: int = 42) -> None:
         torch.cuda.manual_seed_all(seed)
         torch.backends.cudnn.benchmark = True
         torch.backends.cudnn.deterministic = False
-
 
 def log_device_once() -> None:
     """Print which device training will use (once per process)."""
@@ -88,10 +81,8 @@ def log_device_once() -> None:
             msg += " — no GPU detected. Install a CUDA-enabled PyTorch build."
         print(msg)
 
-
 def to_device(tensor: torch.Tensor) -> torch.Tensor:
     return tensor.to(get_torch_device(), non_blocking=is_cuda())
-
 
 def require_cuda() -> None:
     """Fail fast when strict CUDA mode is requested and CUDA is unavailable."""

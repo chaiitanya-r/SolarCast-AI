@@ -26,7 +26,6 @@ set_seeds(42)
 DNN_EPOCHS = 600
 DNN_PATIENCE = 50
 
-
 class DNN(nn.Module):
     def __init__(self, input_dim: int = 8) -> None:
         super().__init__()
@@ -44,7 +43,6 @@ class DNN(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.output(self.features(x))
-
 
 @timer
 def run_dnn() -> dict:
@@ -125,10 +123,8 @@ def run_dnn() -> dict:
         print(f"[warn] Could not generate DNN residual diagnostics: {exc}")
     return metrics
 
-
 def main() -> dict:
     return run_dnn()
-
 
 if __name__ == "__main__":
     main()

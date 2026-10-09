@@ -1,0 +1,12 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints
+notebooks/
+results/plots/
+*.egg-info
+.venv
+venv

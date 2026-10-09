@@ -27,7 +27,6 @@ ANN_EPOCHS = 500
 ANN_PATIENCE = 40
 ANN_LR = 1e-3
 
-
 class ANN(nn.Module):
     def __init__(self, input_dim: int = 8) -> None:
         super().__init__()
@@ -42,7 +41,6 @@ class ANN(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
-
 
 @timer
 def run_ann() -> dict:
@@ -123,10 +121,8 @@ def run_ann() -> dict:
         print(f"[warn] Could not generate ANN residual diagnostics: {exc}")
     return metrics
 
-
 def main() -> dict:
     return run_ann()
-
 
 if __name__ == "__main__":
     main()

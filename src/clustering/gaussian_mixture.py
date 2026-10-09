@@ -20,7 +20,6 @@ FEATURES = ["Temperature", "Irradiance"]
 N_COMPONENTS = 3
 MAX_ROWS = 12000
 
-
 @timer
 def run_gmm() -> pd.DataFrame:
     """Fit GMM, plot BIC/AIC curves, scatter clusters, print covariances."""
@@ -120,10 +119,8 @@ def run_gmm() -> pd.DataFrame:
     print("  Saved: gmm_bic_aic.png, gmm_clusters.png")
     return df
 
-
 def main() -> pd.DataFrame:
     return run_gmm()
-
 
 if __name__ == "__main__":
     main()

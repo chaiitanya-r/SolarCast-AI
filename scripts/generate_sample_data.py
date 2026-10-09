@@ -16,7 +16,6 @@ np.random.seed(42)
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "data" / "raw" / "SolarIridescenceDataset.csv"
 
-
 def main() -> None:
     rows = []
     for year in range(2014, 2023):
@@ -43,7 +42,6 @@ def main() -> None:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(OUT, index=False)
     print(f"Wrote {len(df)} rows to {OUT}")
-
 
 if __name__ == "__main__":
     main()

@@ -25,10 +25,8 @@ from src.utils.device import (
 )
 from src.utils.helpers import get_project_root
 
-
 def set_seeds(seed: int = 42) -> None:
     set_training_seeds(seed)
-
 
 def train_regressor(
     model: nn.Module,
@@ -114,7 +112,6 @@ def train_regressor(
         status = "early stop" if epochs_run < epochs else "done"
         print(f"  {model_label}  → epoch {epochs_run}/{epochs}  val_loss={best_val:.5f}  [{status}]")
     return train_losses, val_losses, elapsed
-
 
 def evaluate_and_save(
     model: nn.Module,

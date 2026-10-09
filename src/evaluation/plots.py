@@ -16,7 +16,6 @@ from sklearn.preprocessing import label_binarize
 
 plt.style.use("seaborn-v0_8")
 
-
 def plot_confusion_matrix(
     y_true: np.ndarray,
     y_pred: np.ndarray,
@@ -34,7 +33,6 @@ def plot_confusion_matrix(
     plt.tight_layout()
     fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
-
 
 def plot_roc_curves(
     models_dict: dict[str, Any],
@@ -62,7 +60,6 @@ def plot_roc_curves(
     fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
 
-
 def plot_loss_curve(
     train_losses: list[float],
     val_losses: list[float],
@@ -81,7 +78,6 @@ def plot_loss_curve(
     plt.tight_layout()
     fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
-
 
 def plot_predictions(
     y_true: np.ndarray,
@@ -103,7 +99,6 @@ def plot_predictions(
     fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
 
-
 def plot_residuals(y_true: np.ndarray, y_pred: np.ndarray, save_path: str) -> None:
     """Scatter plot of residuals vs predicted values."""
     residuals = y_true - y_pred
@@ -116,7 +111,6 @@ def plot_residuals(y_true: np.ndarray, y_pred: np.ndarray, save_path: str) -> No
     plt.tight_layout()
     fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
-
 
 def plot_feature_importance(
     importances: np.ndarray,

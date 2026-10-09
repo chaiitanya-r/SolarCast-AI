@@ -14,7 +14,6 @@ import pandas as pd
 
 from src.utils.helpers import ensure_dirs, get_project_root, load_processed, save_plot, timer
 
-
 def _ghi_class(ghi: float) -> str:
     if ghi < 200:
         return "Low"
@@ -22,14 +21,12 @@ def _ghi_class(ghi: float) -> str:
         return "Medium"
     return "High"
 
-
 def _temp_class(temp: float) -> str:
     if temp < 20:
         return "Cool"
     if temp <= 32:
         return "Warm"
     return "Hot"
-
 
 def _season(month: int | None) -> str:
     if month is None:
@@ -42,7 +39,6 @@ def _season(month: int | None) -> str:
         return "summer"
     return "autumn"
 
-
 def _time_of_day(hour: int | None) -> str:
     if hour is None:
         return "daytime"
@@ -53,7 +49,6 @@ def _time_of_day(hour: int | None) -> str:
     if hour < 17:
         return "afternoon"
     return "evening"
-
 
 def generate_solar_report(
     ghi: float,
@@ -109,7 +104,6 @@ def generate_solar_report(
 
     return f"{gen_sentence} {temp_sentence}"
 
-
 def batch_generate_report(df: pd.DataFrame) -> pd.DataFrame:
     """Apply generate_solar_report to every row; append nlp_report column."""
     out = df.copy()
@@ -126,7 +120,6 @@ def batch_generate_report(df: pd.DataFrame) -> pd.DataFrame:
     out["nlp_report"] = out.apply(_row_report, axis=1)
     return out
 
-
 def save_sample_reports(df: pd.DataFrame, n: int = 10) -> None:
     """Save n sample NLP reports to results/reports/sample_nlp_reports.txt."""
     ensure_dirs()
@@ -139,7 +132,6 @@ def save_sample_reports(df: pd.DataFrame, n: int = 10) -> None:
         lines.append("")
     path.write_text("\n".join(lines), encoding="utf-8")
     print(f"  Saved: sample_nlp_reports.txt")
-
 
 @timer
 def run_nlp() -> pd.DataFrame:
@@ -205,10 +197,8 @@ def run_nlp() -> pd.DataFrame:
     print(f"  Output: {len(df):,} rows with nlp_report column")
     return df
 
-
 def main() -> pd.DataFrame:
     return run_nlp()
-
 
 if __name__ == "__main__":
     main()

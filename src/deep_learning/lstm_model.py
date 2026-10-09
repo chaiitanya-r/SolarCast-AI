@@ -41,7 +41,6 @@ HIDDEN_SIZE = 128
 NUM_LAYERS = 2
 BATCH_SIZE = 256
 
-
 def build_sequences(X: np.ndarray, y: np.ndarray, seq_len: int = SEQ_LEN) -> tuple[np.ndarray, np.ndarray]:
     """Create sliding windows of length seq_len; target is next-step irradiance."""
     xs, ys = [], []
@@ -49,7 +48,6 @@ def build_sequences(X: np.ndarray, y: np.ndarray, seq_len: int = SEQ_LEN) -> tup
         xs.append(X[i : i + seq_len])
         ys.append(y[i + seq_len])
     return np.array(xs, dtype=np.float32), np.array(ys, dtype=np.float32)
-
 
 class LSTMRegressor(nn.Module):
     def __init__(
@@ -79,7 +77,6 @@ class LSTMRegressor(nn.Module):
         out, _ = self.lstm(x)
         return self.head(out[:, -1, :])
 
-
 class LSTMWithAttention(nn.Module):
     def __init__(
         self,
@@ -104,14 +101,13 @@ class LSTMWithAttention(nn.Module):
 
     def forward(self, x: torch.Tensor, return_attention: bool = False) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
         out, _ = self.lstm(x)
-        attn_weights = torch.softmax(self.attention(out), dim=1)  # (batch, seq, 1)
+        attn_weights = torch.softmax(self.attention(out), dim=1)
         context = (attn_weights * out).sum(dim=1)
         out = self.relu(self.fc1(self.dropout(context)))
         result = self.fc2(out)
         if return_attention:
-            return result, attn_weights.squeeze(-1)  # (batch, seq)
+            return result, attn_weights.squeeze(-1)
         return result
-
 
 def _evaluate_lstm(model: nn.Module, X_test: np.ndarray, y_test: np.ndarray) -> dict:
     device = get_torch_device()
@@ -122,7 +118,6 @@ def _evaluate_lstm(model: nn.Module, X_test: np.ndarray, y_test: np.ndarray) -> 
     y_true = inverse_transform_target(y_test)
     y_pred = inverse_transform_target(preds)
     return regression_metrics(y_true, y_pred)
-
 
 @timer
 def run_lstm() -> dict:
@@ -369,10 +364,8 @@ def run_lstm() -> dict:
 
     return results
 
-
 def main() -> dict:
     return run_lstm()
-
 
 if __name__ == "__main__":
     main()

@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
+from mpl_toolkits.mplot3d import Axes3D
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
@@ -23,7 +23,6 @@ plt.style.use("seaborn-v0_8")
 CLUSTER_FEATURES = ["Temperature", "Irradiance"]
 EXTRA_3D = ["Hour", "Temperature", "Irradiance"]
 MAX_ROWS = 15000
-
 
 def _find_best_k(X: np.ndarray, k_range: range = range(2, 11)) -> int:
     inertias, silhouettes = [], []
@@ -61,7 +60,6 @@ def _find_best_k(X: np.ndarray, k_range: range = range(2, 11)) -> int:
     if silhouettes[int(np.argmax(silhouettes))] - silhouettes[2] < 0.02:
         best_k = 3
     return best_k
-
 
 @timer
 def run_kmeans(k: int | None = None) -> pd.DataFrame:
@@ -219,10 +217,8 @@ def run_kmeans(k: int | None = None) -> pd.DataFrame:
     print(f"  Output: {len(df):,} rows × {df.columns.size} cols")
     return df
 
-
 def main() -> pd.DataFrame:
     return run_kmeans()
-
 
 if __name__ == "__main__":
     main()

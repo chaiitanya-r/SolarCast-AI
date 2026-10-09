@@ -21,7 +21,6 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 
-
 def classification_report_dict(
     y_true: np.ndarray,
     y_pred: np.ndarray,
@@ -44,7 +43,6 @@ def classification_report_dict(
     else:
         metrics["roc_auc"] = float("nan")
     return metrics
-
 
 def regression_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, float]:
     """Return RMSE, MAE, MSE, R², nRMSE, and MAPE."""
@@ -69,7 +67,6 @@ def regression_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, floa
         "nrmse": nrmse,
         "mape": mape,
     }
-
 
 def format_metrics_table(metrics_dict: dict[str, Any], title: str = "Metrics") -> str:
     """Pretty-print a metrics dictionary as an aligned text table."""
