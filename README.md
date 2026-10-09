@@ -220,14 +220,3 @@ solar-irradiance-prediction/
 │   └── utils/                 # Path helpers & GPU/device managers
 └── main.py                    # 13-stage batch training pipeline orchestrator
 ```
-
----
-
-## 💼 Resume Description (For Software / Backend Engineers)
-
-**SolarCast AI — Solar Energy Forecasting & Grid Analytics Platform**  
-*Python, PyTorch, Scikit-Learn, Streamlit, Docker, PyTest*  
-- Developed an end-to-end solar irradiance forecasting web platform achieving **97.45% $R^2$** and **42.06 RMSE** using PyTorch deep neural networks (DNN/BiLSTM) and XGBoost.
-- Engineered a leak-free time-series data pipeline incorporating chronological 80/20 splits, cyclical solar geometry encoding, and temporal lag metrics across 45,000+ sensor records.
-- Built an interactive Streamlit operations dashboard featuring real-time parameter simulation, 24-hour horizon batch CSV processing, and automated natural-language dispatch reports.
-- Optimized model serving via memory weight caching, reducing inference latency to **< 5ms**; containerized application with **Docker** and built automated **PyTest** unit test suites.
